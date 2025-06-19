@@ -13,7 +13,7 @@ app.use("/api/v1/course",CourseRouter);
 
 
 const connect =async()=>{
-await mongoose.connect("mongodb+srv://ayushjha:49aVNXa53mNNYtwB@cluster0.vcqzhu7.mongodb.net/Coursify");
+await mongoose.connect("mongodb+srv://ayushjha:49aVNXa53mNNYtwB@cluster0.vcqzhu7.mongodb.net/Coursify-io");
 console.log("connected to database 🫙");
 app.listen(3000,()=>{
     console.log("running on port 3000 🐛");

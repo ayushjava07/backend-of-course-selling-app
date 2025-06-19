@@ -22,17 +22,19 @@ const CourseSchema = new mongoose.Schema({
   price: Number,
 });
 const Purchases = new mongoose.Schema({
-  CourseId: { type: ObjectId, ref: Course },
-  UserId: { type: ObjectId, ref: User },
-  Time: { Date: Date, default: Date.now },
+  CourseId: { type: ObjectId, ref: "CourseModel" },
+  UserId: { type: ObjectId, ref: "UserModel"},
+  Time: { type: Date, default: Date.now },
 });
 
-const User = mongoose.model("User", UserSchema);
-const Admin = mongoose.model("Admin", AdminSchema);
-const Purchase = mongoose.model("Purchases", Purchases);
+const userModel = mongoose.model("User", UserSchema);
+const AdminModel = mongoose.model("Admin", AdminSchema);
+const CourseModel = mongoose.model("Course", CourseSchema);
+const PurchaseModel = mongoose.model("Purchases", Purchases);
 
 module.exports = {
-  User,
-  Admin,
-  Purchase,
+  userModel,
+  AdminModel,
+  PurchaseModel,
+  CourseModel
 };
