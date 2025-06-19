@@ -4,6 +4,7 @@ const UserRouter = express.Router();
 const bcrypt = require("bcrypt");
 var jwt = require("jsonwebtoken");
 const { z, treeifyError } = require("zod/v4");
+const cookieParser = require("cookie-parser");
 const USER_SECRET_key="hadiuhauihuaudahdauju";
 UserRouter.post("/signup", async (req, res) => {
   const { username, firstname, lastname, email, password } = req.body;
@@ -88,10 +89,16 @@ UserRouter.post("/signin", async (req, res) => {
       message: "invalid password",
     });
   }
-  const token=jwt.sign({userId:user._id},USER_SECRET_key)
+  const token=jwt.sign({userId:user._id},USER_SECRET_key,{expiresIn:"1d"})
+  //make cookie
+  res.cookie("token",token,{
+    httpOnly:true,
+    secure:false,
+    sameSite:"strict",
+    maxAge:24*60*60*1000,
+  })
   return res.json({
-    meassage: "signin endpoint😇",
-    token:token
+    meassage: "signin successful😇",
   });
   } catch (error) {
     return res.json({

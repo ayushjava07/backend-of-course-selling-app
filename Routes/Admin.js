@@ -107,8 +107,13 @@ AdminRouter.post("/signin", async (req, res) => {
     }
 
     const token = jwt.sign({ AdminId: adminUser._id }, ADMIN_SECRET_key);
-
-    return res.json({
+    res.cookie("token",token,{
+      httpOnly:true,
+      secure:false,
+      sameSite:"strict",
+      maxAge:24*60*60*1000,
+    })
+      return res.json({
       message: "Signin successful, Admin Sir 😇",
       token: token,
     });

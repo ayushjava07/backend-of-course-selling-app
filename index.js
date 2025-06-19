@@ -1,7 +1,9 @@
 const express=require("express");
+var cookieParser = require('cookie-parser')
 const mongoose =require("mongoose");
 const app=new express();
 app.use(express.json());
+app.use(cookieParser());//enable cookies parsing 
 const UserRouter =require("./Routes/User")
 const AdminRouter =require("./Routes/Admin")
 const CourseRouter =require("./Routes/Course")
