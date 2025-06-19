@@ -5,7 +5,8 @@ const bcrypt = require("bcrypt");
 var jwt = require("jsonwebtoken");
 const { z, treeifyError } = require("zod/v4");
 const cookieParser = require("cookie-parser");
-const USER_SECRET_key="hadiuhauihuaudahdauju";
+const usermiddleware = require("../miidlewares/usermiddleware");
+const USER_SECRET_KEY = process.env.USER_SECRET_KEY;
 UserRouter.post("/signup", async (req, res) => {
   const { username, firstname, lastname, email, password } = req.body;
   const missingfields = [];
@@ -89,7 +90,8 @@ UserRouter.post("/signin", async (req, res) => {
       message: "invalid password",
     });
   }
-  const token=jwt.sign({userId:user._id},USER_SECRET_key,{expiresIn:"1d"})
+const token = jwt.sign({ userId: user._id }, USER_SECRET_KEY);
+
   //make cookie
   res.cookie("token",token,{
     httpOnly:true,
@@ -106,4 +108,9 @@ UserRouter.post("/signin", async (req, res) => {
     })
   }
 });
+UserRouter.get("/course-bulk",usermiddleware,(req,res)=>{
+  res.json({
+    message:"done"
+  })
+})
 module.exports = UserRouter;

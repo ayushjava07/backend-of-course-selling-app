@@ -4,6 +4,7 @@ const mongoose =require("mongoose");
 const app=new express();
 app.use(express.json());
 app.use(cookieParser());//enable cookies parsing 
+require('dotenv').config();
 const UserRouter =require("./Routes/User")
 const AdminRouter =require("./Routes/Admin")
 const CourseRouter =require("./Routes/Course")

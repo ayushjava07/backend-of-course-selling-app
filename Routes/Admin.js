@@ -4,7 +4,9 @@ const AdminRouter = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { z } = require("zod");
-const ADMIN_SECRET_key = "aaddakjolaljikajoi";
+const adminmiddleware = require("../miidlewares/adminmidddleware");
+require('dotenv').config();
+const ADMIN_SECRET_KEY = process.env.ADMIN_SECRET_KEY;
 
 AdminRouter.post("/signup", async (req, res) => {
   const { username, firstname, lastname, email, password } = req.body;
@@ -106,7 +108,7 @@ AdminRouter.post("/signin", async (req, res) => {
       });
     }
 
-    const token = jwt.sign({ AdminId: adminUser._id }, ADMIN_SECRET_key);
+    const token = jwt.sign({ AdminId: adminUser._id }, ADMIN_SECRET_KEY);
     res.cookie("token",token,{
       httpOnly:true,
       secure:false,
@@ -115,7 +117,6 @@ AdminRouter.post("/signin", async (req, res) => {
     })
       return res.json({
       message: "Signin successful, Admin Sir 😇",
-      token: token,
     });
   } catch (error) {
     console.log(error);
@@ -124,5 +125,10 @@ AdminRouter.post("/signin", async (req, res) => {
     });
   }
 });
+AdminRouter.get("/h",adminmiddleware,(req,res)=>{
+  res.json({
+    message:"okokoko"
+  })
+})
 
 module.exports = AdminRouter;
