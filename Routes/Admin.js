@@ -1,5 +1,5 @@
 const express = require("express");
-const { AdminModel } = require("../db");
+const { AdminModel, CourseModel } = require("../db");
 const AdminRouter = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -86,8 +86,6 @@ AdminRouter.post("/signup", async (req, res) => {
     });
   }
 });
-
-// 🔐 Admin Signin
 AdminRouter.post("/signin", async (req, res) => {
   const { username, password } = req.body;
 
@@ -109,14 +107,15 @@ AdminRouter.post("/signin", async (req, res) => {
     }
 
     const token = jwt.sign({ AdminId: adminUser._id }, ADMIN_SECRET_KEY);
-    res.cookie("token",token,{
-      httpOnly:true,
-      secure:false,
-      sameSite:"strict",
-      maxAge:24*60*60*1000,
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000,
     })
-      return res.json({
+    return res.json({
       message: "Signin successful, Admin Sir 😇",
+      adminid:adminUser._id
     });
   } catch (error) {
     console.log(error);
@@ -125,10 +124,117 @@ AdminRouter.post("/signin", async (req, res) => {
     });
   }
 });
-AdminRouter.get("/h",adminmiddleware,(req,res)=>{
-  res.json({
-    message:"okokoko"
-  })
-})
+AdminRouter.post("/course", adminmiddleware,async (req, res) => {
+  const{title,description,imageUrl,price}=req.body;
+  console.log("imageUrl from body: ", req.body.imageUrl);
 
+  const courseAdminId=req.AdminId;
+  console.log(courseAdminId)
+  const isvalid=z.object({
+    title:z.string(),
+    price:z.number().min(0,"enter a valid price"),
+    description:z.string().min(5,"enter description length > 5"),
+    imageUrl: z.string().url("Must be a valid URL"),
+  })
+  try {
+    var validation=isvalid.safeParse(req.body);
+    if(!validation.success){
+      return res.status(402).json({
+        error:validation.error.format(),
+      })
+    }
+    else{
+      const course=await CourseModel.create({
+      title,
+      description,
+      imageUrl,
+      price,
+      AdminId: courseAdminId
+    })
+    res.json({
+      message:"done your course submitted successfully 👏🏼👏🏼",
+      courseId:course._id
+    })
+    }
+  } catch (error) {
+    res.json({
+      message:"something went wrong plz try again later🐛",
+      error:error
+      
+    })
+  }
+})
+AdminRouter.put("/course/update",adminmiddleware,async(req,res)=>{
+  const courseAdminId=req.AdminId;
+  console.log(courseAdminId)
+  const{title,description,price,imageUrl,CourseId}=req.body;
+  const Course=await CourseModel.findOne({
+    _id:CourseId,
+    AdminId:courseAdminId
+  })
+  if(!Course){
+    return res.status(333).json({
+      message:"kindly check that its your course or not 🚨🚨🚨"
+    })
+  }
+  try {
+    const isvalid=z.object({
+    title:z.string(),
+    price:z.number().min(0,"enter a valid price"),
+    description:z.string().min(5,"enter description length > 5"),
+    imageUrl: z.string().url("Must be a valid URL"),
+  })
+    var validation=isvalid.safeParse(req.body);
+    if(!validation.success){
+      return res.status(402).json({
+        error:validation.error.format(),
+      })
+    }
+    else{
+      await Course.updateOne({
+      title,
+      description,
+      imageUrl,
+      price,
+      AdminId: courseAdminId
+    })
+    res.json({
+      message:"done your course updated successfully 👏🏼👏🏼",
+      courseAdminId:courseAdminId
+    })
+    }
+  } catch (error) {
+    res.json({
+      message:"something went wrong plz try again later🐛",
+      error
+    })
+  }
+
+})
+AdminRouter.get("/owncourse",adminmiddleware,async(req,res)=>{
+  const AdminId=req.AdminId;
+  const courses=await CourseModel.find({
+    AdminId
+  })
+  try {
+    if(courses){
+    return res.json({
+      courses:courses
+    })
+    }
+  else{
+    
+      return res.json({
+        message:"you dont have any course",
+        
+      })
+  }
+  } catch (error) {
+    console.error("Own course fetch error:", error);
+    res.status(400).json({
+      message:"something went wrong try again later🐛",
+      error:error.message
+    })
+  }
+})
 module.exports = AdminRouter;

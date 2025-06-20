@@ -16,14 +16,18 @@ const AdminSchema = new mongoose.Schema({
   email: { type: String, unique: true },
   password: String,
 });
+
 const CourseSchema = new mongoose.Schema({
   title: String,
   description: String,
+  imageUrl: { type: String, unique: true },
   price: Number,
+  AdminId: { type: ObjectId, ref: "Admin" }, // ✅ Matches model name
 });
+
 const Purchases = new mongoose.Schema({
-  CourseId: { type: ObjectId, ref: "CourseModel" },
-  UserId: { type: ObjectId, ref: "UserModel"},
+  CourseId: { type: ObjectId, ref: "Course" }, // ✅
+  UserId: { type: ObjectId, ref: "User" },     // ✅
   Time: { type: Date, default: Date.now },
 });
 

@@ -3,7 +3,9 @@ const adminmiddleware = (req, res, next) => {
     const token = req.cookies.token;
     try {
         const verify = jwt.verify(token, process.env.ADMIN_SECRET_KEY);
+
         if (verify) {
+            req.AdminId=verify.AdminId;
             next();
         }
         else {
